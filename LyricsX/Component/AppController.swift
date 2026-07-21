@@ -238,7 +238,13 @@ class AppController: NSObject {
         }
 
         let duration = track.duration ?? 0
-        let request = LyricsSearchRequest(searchTerm: .info(title: title, artist: artist), duration: duration, limit: 5)
+        let userInfo = track.album.map { ["album": $0] } ?? [:]
+        let request = LyricsSearchRequest(
+            searchTerm: .info(title: title, artist: artist),
+            duration: duration,
+            limit: 5,
+            userInfo: userInfo
+        )
         searchRequest = request
         searchTask = Task { @MainActor in
             do {
@@ -288,7 +294,7 @@ class AppController: NSObject {
               let track = selectedPlayer.currentTrack else {
             return
         }
-        if defaults[.strictSearchEnabled], !lyrics.isMatched() {
+        if defaults[.strictSearchEnabled], !lyricsMatchesSearchIdentity(lyrics) {
             return
         }
         if let current = currentLyrics, !lyricsHasHigherPriority(lyrics, over: current) {

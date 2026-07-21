@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AMLL Original Theme</title>
+    <script defer src="./assets/index-CwlTbf4q.js"></script>
+    <link rel="stylesheet" href="./assets/index-B3NmonxJ.css">
+  </head>
+  <body>
+    <div id="root">
+      <div style="height:100vh;display:grid;place-items:center;color:rgba(255,255,255,.72);font:14px -apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif;text-align:center;">
+        AMLL Original Source loading...
+      </div>
+    </div>
+    <script>
+      window.addEventListener("error", function (event) {
+        var message = "AMLL Original Source script error: " + event.message;
+        var root = document.getElementById("root");
+        if (root) {
+          root.innerHTML = '<div style="height:100vh;display:grid;place-items:center;color:rgba(255,255,255,.78);font:14px -apple-system,BlinkMacSystemFont,\\'PingFang SC\\',sans-serif;text-align:center;padding:24px;box-sizing:border-box;">' + message + "</div>";
+        }
+        window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.amllLog && window.webkit.messageHandlers.amllLog.postMessage(message);
+      });
+    </script>
+  </body>
+</html>

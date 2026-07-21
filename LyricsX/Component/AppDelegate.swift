@@ -3,7 +3,6 @@ import GenericID
 import MASShortcut
 import MusicPlayer
 import Sparkle
-import Semver
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValidation, NSMenuDelegate {
@@ -17,8 +16,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValidation, NSMenu
     @IBOutlet var statusBarMenu: NSMenu!
 
     private lazy var updateController = SPUStandardUpdaterController(updaterDelegate: nil, userDriverDelegate: self)
-
-    var firstLaunchForShouldHanlderReopen: Bool = true
 
     var karaokeLyricsWC: KaraokeLyricsWindowController?
 
@@ -39,6 +36,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValidation, NSMenu
 
         MenuBarLyricsController.shared.statusBarMenu = statusBarMenu
         statusBarMenu.delegate = self
+        updateAboutMenuTitle()
 
         lyricsOffsetStepper.bind(
             .value,
@@ -87,12 +85,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValidation, NSMenu
     }
 
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows: Bool) -> Bool {
-        if firstLaunchForShouldHanlderReopen {
-            firstLaunchForShouldHanlderReopen = false
-            return false
-        }
-        preferencesWindowController.showWindow(nil)
-        return true
+        return hasVisibleWindows
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {
@@ -139,6 +132,29 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValidation, NSMenu
         binder.bindShortcut(.shortcutTogglePreferences, to: #selector(togglePreferences))
     }
 
+    private var appVersionAndBuild: String {
+        let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String
+        let build = Bundle.main.object(forInfoDictionaryKey: kCFBundleVersionKey as String) as? String
+
+        switch (version?.isEmpty == false ? version : nil, build?.isEmpty == false ? build : nil) {
+        case let (version?, build?):
+            return "\(version) (Build \(build))"
+        case let (version?, nil):
+            return version
+        case let (nil, build?):
+            return "Build \(build)"
+        default:
+            return "Unknown"
+        }
+    }
+
+    private func updateAboutMenuTitle() {
+        guard let aboutItem = statusBarMenu.item(withTag: 400) else {
+            return
+        }
+        aboutItem.title = "\(aboutItem.title) \(appVersionAndBuild)"
+    }
+
     // MARK: - NSMenuDelegate
 
     func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
@@ -154,6 +170,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValidation, NSMenu
 
     func menuNeedsUpdate(_ menu: NSMenu) {
         menu.item(withTag: 202)?.isEnabled = AppController.shared.currentLyrics != nil
+        menu.item(withTag: 102)?.state = defaults[.isShowLyricsHUD] ? .on : .off
     }
 
     // MARK: - Menubar Action
@@ -173,7 +190,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValidation, NSMenu
     @IBAction func aboutLyricsXAction(_ sender: Any) {
         if #available(OSX 10.13, *) {
             let channel = "GitHub"
-            let versionString = "\(channel) Version \(Bundle.main.semanticVersion ?? "Unknown")"
+            let versionString = "\(channel) Version \(appVersionAndBuild)"
             NSApp.orderFrontStandardAboutPanel(options: [.applicationVersion: versionString])
         } else {
             NSApp.orderFrontStandardAboutPanel(sender)
@@ -270,13 +287,78 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValidation, NSMenu
             .desktopLyricsProgressColor: #colorLiteral(red: 0.1985405816, green: 1, blue: 0.8664234302, alpha: 1),
             .desktopLyricsShadowColor: #colorLiteral(red: 0, green: 1, blue: 0.8333333333, alpha: 1),
             .desktopLyricsBackgroundColor: #colorLiteral(red: 0, green: 0, blue: 0, alpha: 0.6041579279),
+            .desktopLyricsInactiveLineBlurRadius: 2.0,
+            .desktopLyricsTheme: DesktopLyricsTheme.classic.rawValue,
+            .desktopLyricsModernFontName: NSFont.boldSystemFont(ofSize: 30).fontName,
+            .desktopLyricsModernFontSize: 30,
+            .desktopLyricsModernTextColor: #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1),
+            .desktopLyricsModernProgressColor: desktopLyricsModernDefaultProgressColor,
+            .desktopLyricsModernBackgroundColor: #colorLiteral(red: 0.1764705882, green: 0.2352941176, blue: 0.8, alpha: 1),
+            .desktopLyricsModernUseAlbumColor: true,
+            .desktopLyricsModernBackgroundOpacity: 0.5,
+            .desktopLyricsModernBlurEnabled: true,
+            .desktopLyricsModernCornerRadius: 16.0,
+            .desktopLyricsModernInactiveLineBlurRadius: 2.0,
+            .desktopLyricsModernProgressColorMigratedV1: false,
+            .desktopLyricsAlbumBlurFontName: NSFont.boldSystemFont(ofSize: 30).fontName,
+            .desktopLyricsAlbumBlurFontSize: 30,
+            .desktopLyricsAlbumBlurTextColor: #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1),
+            .desktopLyricsAlbumBlurProgressColor: desktopLyricsAlbumBlurDefaultProgressColor,
+            .desktopLyricsAlbumBlurTintColor: #colorLiteral(red: 0, green: 0, blue: 0, alpha: 1),
+            .desktopLyricsAlbumBlurFallbackColor: #colorLiteral(red: 0.1764705882, green: 0.2352941176, blue: 0.8, alpha: 1),
+            .desktopLyricsAlbumBlurBackgroundOpacity: 0.65,
+            .desktopLyricsAlbumBlurDimAmount: 0.42,
+            .desktopLyricsAlbumBlurBlurAmount: 0.5,
+            .desktopLyricsAlbumBlurCornerRadius: 16.0,
+            .desktopLyricsAlbumBlurInactiveLineBlurRadius: 2.0,
+            .desktopLyricsAlbumBlurReverseProgressGradient: false,
+            .desktopLyricsAlbumBlurThemeSplitMigratedV1: false,
+            .desktopLyricsAMLLDynamicFontName: NSFont.boldSystemFont(ofSize: 30).fontName,
+            .desktopLyricsAMLLDynamicFontSize: 30,
+            .desktopLyricsAMLLDynamicTextColor: #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1),
+            .desktopLyricsAMLLDynamicProgressColor: desktopLyricsAMLLDynamicDefaultProgressColor,
+            .desktopLyricsAMLLDynamicTintColor: #colorLiteral(red: 0, green: 0, blue: 0, alpha: 1),
+            .desktopLyricsAMLLDynamicFallbackColor: desktopLyricsAMLLDynamicDefaultFallbackColor,
+            .desktopLyricsAMLLDynamicBackgroundOpacity: 0.65,
+            .desktopLyricsAMLLDynamicDimAmount: 0.34,
+            .desktopLyricsAMLLDynamicFlowSpeed: 0.9,
+            .desktopLyricsAMLLDynamicIntensity: 0.72,
+            .desktopLyricsAMLLDynamicCornerRadius: 18.0,
+            .desktopLyricsAMLLDynamicInactiveLineBlurRadius: 2.0,
+            .desktopLyricsAMLLDynamicReverseProgressGradient: false,
             .lyricsWindowTextColor: #colorLiteral(red: 0.7540688515, green: 0.7540867925, blue: 0.7540771365, alpha: 1),
             .lyricsWindowHighlightColor: #colorLiteral(red: 0.8866666667, green: 1, blue: 0.8, alpha: 1),
+            .lyricsWindowTheme: LyricsWindowTheme.classic.rawValue,
+            .lyricsWindowAMLLOriginalFontName: NSFont.boldSystemFont(ofSize: 32).fontName,
+            .lyricsWindowAMLLOriginalFontSize: 32,
+            .lyricsWindowAMLLDynamicAlignment: LyricsWindowAMLLAlignment.left.rawValue,
+            .lyricsWindowAMLLDynamicLineSpacing: 1.0,
+            .lyricsWindowAMLLDynamicMotionAmount: 1.0,
             .preferBilingualLyrics: isZh,
             .chineseConversionIndex: isHant ? 2 : 0,
             .desktopLyricsXPositionFactor: 0.5,
             .desktopLyricsYPositionFactor: 0.9,
         ])
+        migrateDesktopLyricsThemeDefaults()
+    }
+
+    private func migrateDesktopLyricsThemeDefaults() {
+        if !defaults[.desktopLyricsModernProgressColorMigratedV1] {
+            let progressColor = defaults.color(for: .desktopLyricsModernProgressColor, fallback: .white)
+            let textColor = defaults.color(for: .desktopLyricsModernTextColor, fallback: .white)
+            if progressColor.isVisuallyClose(to: .white), textColor.isVisuallyClose(to: .white) {
+                defaults.setColor(desktopLyricsModernDefaultProgressColor, for: .desktopLyricsModernProgressColor)
+            }
+            defaults[.desktopLyricsModernProgressColorMigratedV1] = true
+        }
+
+        if !defaults[.desktopLyricsAlbumBlurThemeSplitMigratedV1] {
+            let theme = DesktopLyricsTheme(rawValue: defaults[.desktopLyricsTheme])
+            if theme == .modern, defaults[.desktopLyricsModernUseAlbumColor] {
+                defaults[.desktopLyricsTheme] = DesktopLyricsTheme.albumBlur.rawValue
+            }
+            defaults[.desktopLyricsAlbumBlurThemeSplitMigratedV1] = true
+        }
     }
 
     func menuWillOpen(_ menu: NSMenu) {

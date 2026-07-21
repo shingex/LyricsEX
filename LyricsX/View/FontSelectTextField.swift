@@ -19,9 +19,19 @@ class FontSelectTextField: NSTextField, NSWindowDelegate {
         set {}
     }
 
+    override init(frame frameRect: NSRect) {
+        super.init(frame: frameRect)
+        setup()
+    }
+
     required init?(coder: NSCoder) {
         super.init(coder: coder)
+        setup()
+    }
+
+    private func setup() {
         _ = FontSelectTextField.swizzler
+        guard subviews.isEmpty else { return }
         let btn = NSButton(frame: .zero).then { btn in
             btn.bezelStyle = .regularSquare
             btn.setButtonType(.momentaryPushIn)

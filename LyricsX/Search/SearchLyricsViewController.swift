@@ -68,7 +68,13 @@ class SearchLyricsViewController: NSViewController, NSTableViewDelegate, NSTable
 
         let track = selectedPlayer.currentTrack
         let duration = track?.duration ?? 0
-        let req = LyricsSearchRequest(searchTerm: .info(title: searchTitle, artist: searchArtist), duration: duration, limit: 8)
+        let userInfo = track?.album.map { ["album": $0] } ?? [:]
+        let req = LyricsSearchRequest(
+            searchTerm: .info(title: searchTitle, artist: searchArtist),
+            duration: duration,
+            limit: 8,
+            userInfo: userInfo
+        )
         searchRequest = req
         progressIndicator.startAnimation(nil)
         tableView.reloadData()
@@ -144,6 +150,8 @@ class SearchLyricsViewController: NSViewController, NSTableViewDelegate, NSTable
             return searchResult[row].idTags[.title] ?? "[lacking]"
         case .searchResultColumnArtist:
             return searchResult[row].idTags[.artist] ?? "[lacking]"
+        case .searchResultColumnAlbum:
+            return searchResult[row].idTags[.album] ?? "[lacking]"
         case .searchResultColumnSource:
             return searchResult[row].metadata.service ?? "[lacking]"
         default:

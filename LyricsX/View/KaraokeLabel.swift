@@ -1,4 +1,5 @@
 import Cocoa
+import CoreImage
 import SwiftCF
 import CoreGraphicsExt
 import CoreTextExt
@@ -96,21 +97,6 @@ class KaraokeLabel: NSTextField {
     }
 
     private var _ctFrame: CTFrame?
-//    private var ctFrame: CTFrame {
-//        if let ctFrame = _ctFrame {
-//            return ctFrame
-//        }
-//        layoutSubtreeIfNeeded()
-//        let progression: CTFrameProgression = isVertical ? .rightToLeft : .topToBottom
-//        let frameAttr: [CTFrame.AttributeKey: Any] = [.progression: progression.rawValue as NSNumber]
-//        let framesetter = CTFramesetter.create(attributedString: attrString)
-//        print(bounds.size)
-//        let (suggestSize, fitRange) = framesetter.suggestFrameSize(constraints: bounds.size, frameAttributes: frameAttr)
-//        let path = CGPath(rect: CGRect(origin: .zero, size: suggestSize), transform: nil)
-//        let ctFrame = framesetter.frame(stringRange: fitRange, path: path, frameAttributes: frameAttr)
-//        _ctFrame = ctFrame
-//        return ctFrame
-//    }
 
     private func ctFrame(_ dirtyRect: NSRect? = nil) -> CTFrame {
         if let ctFrame = _ctFrame {
@@ -138,22 +124,14 @@ class KaraokeLabel: NSTextField {
     }
 
     override func draw(_ dirtyRect: NSRect) {
-//        let image = NSImage(size: dirtyRect.size, flipped: true) { rect in
-//            guard let context = NSGraphicsContext.current else { return false }
-//            let cgContext = context.cgContext
-//            cgContext.textMatrix = .identity
-//            cgContext.translateBy(x: 0, y: rect.height)
-//            cgContext.scaleBy(x: 1.0, y: -1.0)
-//            CTFrameDraw(self.ctFrame, cgContext)
-//            return true
-//        }
-//        image.draw(in: dirtyRect)
         guard let context = NSGraphicsContext.current else { return }
         let cgContext = context.cgContext
         cgContext.textMatrix = .identity
         cgContext.translateBy(x: 0, y: bounds.height)
         cgContext.scaleBy(x: 1.0, y: -1.0)
-        CTFrameDraw(ctFrame(dirtyRect), cgContext)
+        if !isProgressLayerActive {
+            CTFrameDraw(ctFrame(dirtyRect), cgContext)
+        }
 
         drawRomajiAnnotations(in: cgContext, frame: ctFrame())
     }
@@ -161,8 +139,14 @@ class KaraokeLabel: NSTextField {
     // MARK: - Progress
 
     // TODO: multi-line
-    private lazy var progressLayer: CALayer = {
-        let pLayer = CALayer()
+    private var solidProgressColor: NSColor?
+    private var isProgressLayerActive = false
+    private var displaysProgressGradientAsBase = false
+    private var progressBoundaryGap: CGFloat = 0
+    private var textBlurRadius: CGFloat = 0
+
+    private lazy var progressLayer: CAGradientLayer = {
+        let pLayer = CAGradientLayer()
         wantsLayer = true
         layer?.addSublayer(pLayer)
         return pLayer
@@ -170,18 +154,119 @@ class KaraokeLabel: NSTextField {
 
     @objc dynamic var progressColor: NSColor? {
         get {
-            return progressLayer.backgroundColor.flatMap(NSColor.init)
+            return solidProgressColor
         }
         set {
-            progressLayer.backgroundColor = newValue?.cgColor
+            solidProgressColor = newValue
+            updateProgressLayerColors()
+        }
+    }
+
+    var progressGradientColors: [NSColor]? {
+        didSet {
+            updateProgressLayerColors()
+        }
+    }
+
+    var reversesProgressGradient = false {
+        didSet {
+            updateProgressLayerColors()
         }
     }
 
     func setProgressAnimation(color: NSColor, progress: [(TimeInterval, Int)]) {
+        progressGradientColors = nil
+        progressColor = color
+        runProgressAnimation(progress: progress)
+    }
+
+    func setProgressAnimation(colors: [NSColor], progress: [(TimeInterval, Int)]) {
+        if colors.count >= 2 {
+            progressGradientColors = colors
+        } else if let color = colors.first {
+            progressGradientColors = nil
+            progressColor = color
+        }
+        runProgressAnimation(progress: progress)
+    }
+
+    func setDisplaysProgressGradientAsBase(_ displays: Bool) {
+        if displays {
+            if displaysProgressGradientAsBase, isProgressLayerActive {
+                updateProgressLayerColors()
+                return
+            }
+            removeProgressAnimation()
+            displaysProgressGradientAsBase = true
+            guard prepareProgressLayer() != nil else { return }
+            CATransaction.begin()
+            CATransaction.setDisableActions(true)
+            progressLayer.locations = [0, 1]
+            CATransaction.commit()
+        } else if displaysProgressGradientAsBase {
+            displaysProgressGradientAsBase = false
+            removeProgressAnimation()
+        }
+    }
+
+    func setTextBlurRadius(_ radius: CGFloat) {
+        let radius = max(0, radius)
+        guard radius != textBlurRadius else { return }
+        textBlurRadius = radius
+        wantsLayer = true
+        layer?.masksToBounds = false
+
+        guard radius > 0, let filter = CIFilter(name: "CIGaussianBlur") else {
+            layer?.filters = []
+            return
+        }
+        filter.setValue(radius, forKey: kCIInputRadiusKey)
+        layer?.filters = [filter]
+    }
+
+    private func runProgressAnimation(progress: [(TimeInterval, Int)]) {
+        displaysProgressGradientAsBase = false
         removeProgressAnimation()
+        guard let progressLayout = prepareProgressLayer() else { return }
+        let line = progressLayout.line
+        let progressExtent = progressLayout.extent
+        let progressLeadingInset = progressLayout.leadingInset
+        let progressBleed = progressLayout.bleed
+
+        progressBoundaryGap = min(max((font?.pointSize ?? 24) * 0.5, 1) / max(progressExtent, 1), 1)
+        guard let index = progress.firstIndex(where: { $0.0 > 0 }) else {
+            progressLayer.locations = progressLayerLocations(for: progressExtent, extent: progressExtent)
+            return
+        }
+        var map = progress.map {
+            (
+                $0.0,
+                min(max(line.offset(charIndex: $0.1).primary + progressLeadingInset + progressBleed, 0), progressExtent)
+            )
+        }
+        if index > 0 {
+            let progress = map[index - 1].1 + CGFloat(map[index - 1].0) * (map[index].1 - map[index - 1].1) / CGFloat(map[index].0 - map[index - 1].0)
+            map.replaceSubrange(..<index, with: [(0, progress)])
+        }
+
+        let duration = map.last!.0
+        let locationValues = map.map { progressLayerLocations(for: $0.1, extent: progressExtent) }
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
+        progressLayer.locations = locationValues.last
+        CATransaction.commit()
+        let animation = CAKeyframeAnimation()
+        animation.keyTimes = map.map { ($0.0 / duration) as NSNumber }
+        animation.values = locationValues
+        animation.keyPath = "locations"
+        animation.duration = duration
+        progressLayer.add(animation, forKey: "inlineProgress")
+    }
+
+    private func prepareProgressLayer() -> (line: CTLine, leadingInset: CGFloat, extent: CGFloat, bleed: CGFloat)? {
         guard let line = ctFrame().lines.first,
               let origin = ctFrame().lineOrigins(range: CFRange(location: 0, length: 1)).first else {
-            return
+            return nil
         }
         var lineBounds = line.bounds()
         var transform = CGAffineTransform.translate(x: origin.x, y: origin.y)
@@ -190,36 +275,37 @@ class KaraokeLabel: NSTextField {
             transform *= .flip(height: bounds.height)
         }
         lineBounds.apply(t: transform)
+        let progressBleed = max(2, ceil((font?.pointSize ?? 24) * 0.06))
+        let progressBounds = lineBounds
+            .insetBy(dx: -progressBleed, dy: -progressBleed)
+            .integral
+        let progressLeadingInset = isVertical
+            ? lineBounds.minY - progressBounds.minY
+            : lineBounds.minX - progressBounds.minX
+        let progressExtent = isVertical ? progressBounds.height : progressBounds.width
+        let backingScale = window?.backingScaleFactor ?? NSScreen.main?.backingScaleFactor ?? 2
 
         progressLayer.anchorPoint = isVertical ? CGPoint(x: 0.5, y: 0) : CGPoint(x: 0, y: 0.5)
-        progressLayer.frame = lineBounds
-        progressLayer.backgroundColor = color.cgColor
+        progressLayer.frame = progressBounds
+        progressLayer.contentsScale = backingScale
+        progressLayer.startPoint = isVertical ? CGPoint(x: 0.5, y: 0) : CGPoint(x: 0, y: 0.5)
+        progressLayer.endPoint = isVertical ? CGPoint(x: 0.5, y: 1) : CGPoint(x: 1, y: 0.5)
+        updateProgressLayerColors()
+        isProgressLayerActive = true
+        needsDisplay = true
         let mask = CALayer()
         mask.frame = progressLayer.bounds
+        mask.contentsScale = backingScale
         let img = NSImage(size: progressLayer.bounds.size, flipped: false) { _ in
             let context = NSGraphicsContext.current!.cgContext
-            let ori = lineBounds.applying(.flip(height: self.bounds.height)).origin
+            let ori = progressBounds.applying(.flip(height: self.bounds.height)).origin
             context.concatenate(.translate(x: -ori.x, y: -ori.y))
             CTFrameDraw(self.ctFrame(), context)
             return true
         }
         mask.contents = img.cgImage(forProposedRect: nil, context: nil, hints: nil)
         progressLayer.mask = mask
-
-        guard let index = progress.firstIndex(where: { $0.0 > 0 }) else { return }
-        var map = progress.map { ($0.0, line.offset(charIndex: $0.1).primary) }
-        if index > 0 {
-            let progress = map[index - 1].1 + CGFloat(map[index - 1].0) * (map[index].1 - map[index - 1].1) / CGFloat(map[index].0 - map[index - 1].0)
-            map.replaceSubrange(..<index, with: [(0, progress)])
-        }
-
-        let duration = map.last!.0
-        let animation = CAKeyframeAnimation()
-        animation.keyTimes = map.map { ($0.0 / duration) as NSNumber }
-        animation.values = map.map { $0.1 }
-        animation.keyPath = isVertical ? "bounds.size.height" : "bounds.size.width"
-        animation.duration = duration
-        progressLayer.add(animation, forKey: "inlineProgress")
+        return (line, progressLeadingInset, progressExtent, progressBleed)
     }
 
     func pauseProgressAnimation() {
@@ -244,7 +330,35 @@ class KaraokeLabel: NSTextField {
         progressLayer.timeOffset = 0
         progressLayer.removeAnimation(forKey: "inlineProgress")
         progressLayer.frame = .zero
+        progressLayer.mask = nil
+        isProgressLayerActive = false
+        needsDisplay = true
         CATransaction.commit()
+    }
+
+    private func updateProgressLayerColors() {
+        let progressColors = progressGradientColors ?? solidProgressColor.map { [$0, $0] } ?? []
+        guard let firstProgressColor = progressColors.first,
+              let lastProgressColor = progressColors.last else {
+            progressLayer.colors = []
+            return
+        }
+        let baseColor = textColor ?? .black
+        let colors: [NSColor]
+        if displaysProgressGradientAsBase {
+            colors = [lastProgressColor, firstProgressColor]
+        } else if reversesProgressGradient {
+            colors = [baseColor, baseColor, lastProgressColor, firstProgressColor]
+        } else {
+            colors = [firstProgressColor, lastProgressColor, baseColor, baseColor]
+        }
+        progressLayer.colors = colors.map(\.cgColor)
+    }
+
+    private func progressLayerLocations(for progress: CGFloat, extent: CGFloat) -> [NSNumber] {
+        let leadingProgress = (progress / max(extent, 1)).clamped(to: 0...1)
+        let trailingBaseProgress = min(leadingProgress + progressBoundaryGap, 1)
+        return [0, leadingProgress, trailingBaseProgress, 1].map { $0 as NSNumber }
     }
 
     private func drawRomajiAnnotations(in context: CGContext, frame: CTFrame) {
