@@ -19,17 +19,26 @@ class MenuBarLyricsController {
 
     var statusBarMenu: NSMenu? {
         didSet {
-            setupStatusItemMenu()
+            setupStatusItemAction()
         }
     }
 
     private var statusItem: NSStatusItem?
-    private var buttonImage = #imageLiteral(resourceName: "status_bar_icon")
-    private var buttonLength: CGFloat = 30
+    private var statusItemCanBeCreated = false
+    private lazy var buttonImage: NSImage = {
+        if #available(macOS 11.0, *) {
+            return NSImage(
+                systemSymbolName: "music.note",
+                accessibilityDescription: "LyricsX"
+            ) ?? #imageLiteral(resourceName: "status_bar_icon")
+        }
+        return #imageLiteral(resourceName: "status_bar_icon")
+    }()
 
     private let marqueeLabel = StatusItemMarqueeLabel(frame: .init(x: 0, y: 0, width: 183, height: 22))
 
     private static let defaultLyric = "LyricsX"
+    private var playbackIsPlaying = selectedPlayer.playbackState.isPlaying
 
     private var screenLyrics: (lyrics: String, duration: TimeInterval) = (MenuBarLyricsController.defaultLyric, 2) {
         didSet {
@@ -50,6 +59,10 @@ class MenuBarLyricsController {
             .receive(on: DispatchQueue.lyricsDisplay)
             .invoke(MenuBarLyricsController.handleLyricsDisplay, weaklyOn: self)
             .store(in: &cancelBag)
+        selectedPlayer.playbackStateWillChange
+            .receive(on: DispatchQueue.main)
+            .invoke(MenuBarLyricsController.handlePlaybackState, weaklyOn: self)
+            .store(in: &cancelBag)
         workspaceNC
             .publisher(for: NSWorkspace.didActivateApplicationNotification)
             .signal()
@@ -59,6 +72,27 @@ class MenuBarLyricsController {
             .prepend()
             .invoke(MenuBarLyricsController.updateStatusItems, weaklyOn: self)
             .store(in: &cancelBag)
+        NotificationCenter.default.publisher(for: NSApplication.didChangeScreenParametersNotification)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.placeStatusItemOnPrimaryMenuBar()
+            }
+            .store(in: &cancelBag)
+    }
+
+    func install(statusItem: NSStatusItem, menu: NSMenu) {
+        self.statusItem = statusItem
+        statusBarMenu = menu
+        statusItemCanBeCreated = true
+        updateStatusItems()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
+            self?.placeStatusItemOnPrimaryMenuBar()
+        }
+    }
+
+    private func handlePlaybackState(_ state: PlaybackState) {
+        playbackIsPlaying = state.isPlaying
+        updateStatusItems()
     }
 
     private func handleLyricsDisplay(event: (lyrics: Lyrics?, index: Int?)) {
@@ -88,6 +122,7 @@ class MenuBarLyricsController {
     }
 
     @objc private func updateStatusItems() {
+        guard statusItemCanBeCreated else { return }
         guard !defaults[.hideMenuBarItems] else {
             marqueeLabel.removeFromSuperview()
             removeStatusItem()
@@ -103,11 +138,22 @@ class MenuBarLyricsController {
     }
 
     private func updateStatusLyrics() {
-        setupLyricStatusItem()
-        marqueeLabel.setStringValue(screenLyrics.lyrics, lineDisplayTime: screenLyrics.duration)
+        if playbackIsPlaying, needsMarquee(for: screenLyrics.lyrics) {
+            setupMarqueeStatusItem()
+            marqueeLabel.setStringValue(screenLyrics.lyrics, lineDisplayTime: screenLyrics.duration)
+        } else {
+            setupStaticLyricStatusItem()
+        }
     }
 
-    private func setupLyricStatusItem() {
+    private func needsMarquee(for lyrics: String) -> Bool {
+        let attributes: [NSAttributedString.Key: Any] = [
+            .font: NSFont.systemFont(ofSize: NSFont.systemFontSize),
+        ]
+        return (lyrics as NSString).size(withAttributes: attributes).width > marqueeLabel.bounds.width
+    }
+
+    private func setupMarqueeStatusItem() {
         marqueeLabel.removeFromSuperview()
         let item = makeStatusItemIfNeeded()
         item.button?.title = ""
@@ -115,7 +161,16 @@ class MenuBarLyricsController {
         item.length = marqueeLabel.bounds.width
         item.button?.frame = marqueeLabel.bounds
         item.button?.addSubview(marqueeLabel)
-        setupStatusItemMenu()
+        setupStatusItemAction()
+    }
+
+    private func setupStaticLyricStatusItem() {
+        marqueeLabel.removeFromSuperview()
+        let item = makeStatusItemIfNeeded()
+        item.button?.image = nil
+        item.button?.title = screenLyrics.lyrics
+        item.length = marqueeLabel.bounds.width
+        setupStatusItemAction()
     }
 
     private func setupIconStatusItem() {
@@ -123,8 +178,10 @@ class MenuBarLyricsController {
         let item = makeStatusItemIfNeeded()
         item.button?.title = ""
         item.button?.image = buttonImage
-        item.length = buttonLength
-        setupStatusItemMenu()
+        item.button?.imagePosition = .imageOnly
+        item.button?.toolTip = "LyricsX"
+        item.length = NSStatusItem.squareLength
+        setupStatusItemAction()
     }
 
     private func makeStatusItemIfNeeded() -> NSStatusItem {
@@ -144,8 +201,44 @@ class MenuBarLyricsController {
         self.statusItem = nil
     }
 
-    private func setupStatusItemMenu() {
-        statusItem?.menu = statusBarMenu
+    private func setupStatusItemAction() {
+        guard let button = statusItem?.button else { return }
+        statusItem?.menu = nil
+        button.target = self
+        button.action = #selector(showStatusBarMenu(_:))
+        DispatchQueue.main.async { [weak self] in
+            self?.placeStatusItemOnPrimaryMenuBar()
+        }
+    }
+
+    private func placeStatusItemOnPrimaryMenuBar() {
+        guard NSScreen.screens.count > 1,
+              let primaryScreen = NSScreen.screens.first,
+              let window = statusItem?.button?.window else {
+            return
+        }
+
+        let center = NSPoint(x: window.frame.midX, y: window.frame.midY)
+        guard let currentScreen = NSScreen.screens.first(where: { $0.frame.contains(center) }),
+              currentScreen != primaryScreen else {
+            return
+        }
+
+        let trailingInset = max(0, currentScreen.frame.maxX - window.frame.maxX)
+        let origin = NSPoint(
+            x: primaryScreen.frame.maxX - trailingInset - window.frame.width,
+            y: primaryScreen.frame.maxY - window.frame.height
+        )
+        window.setFrameOrigin(origin)
+        window.orderFrontRegardless()
+    }
+
+    @objc private func showStatusBarMenu(_ sender: NSStatusBarButton) {
+        statusBarMenu?.popUp(
+            positioning: nil,
+            at: NSPoint(x: 0, y: sender.bounds.maxY + 4),
+            in: sender
+        )
     }
 }
 

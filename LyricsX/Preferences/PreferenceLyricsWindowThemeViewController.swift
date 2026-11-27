@@ -24,7 +24,7 @@ class PreferenceLyricsWindowThemeViewController: PreferenceViewController, FontS
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        title = "Lyrics Window Theme"
+        title = preferenceLocalized("Lyrics Window")
         setupViews()
         reloadControls()
     }
@@ -33,18 +33,18 @@ class PreferenceLyricsWindowThemeViewController: PreferenceViewController, FontS
         let root = NSStackView()
         root.orientation = .vertical
         root.alignment = .centerX
-        root.spacing = 18
+        root.spacing = 24
         root.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(root)
 
         NSLayoutConstraint.activate([
-            root.topAnchor.constraint(equalTo: view.topAnchor, constant: 24),
+            root.topAnchor.constraint(equalTo: view.topAnchor, constant: 28),
             root.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 32),
             root.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -32),
         ])
 
-        configureThemeButton(classicThemeButton, title: "Classic", theme: .classic, image: themePreviewImage(theme: .classic))
-        configureThemeButton(amllOriginalSourceThemeButton, title: "AMLL Original Source", theme: .amllOriginalSource, image: themePreviewImage(theme: .amllOriginalSource))
+        configureThemeButton(classicThemeButton, title: preferenceLocalized("Classic"), theme: .classic, image: themePreviewImage(theme: .classic))
+        configureThemeButton(amllOriginalSourceThemeButton, title: preferenceLocalized("AMLL Original Source"), theme: .amllOriginalSource, image: themePreviewImage(theme: .amllOriginalSource))
 
         let themeList = NSStackView(views: [classicThemeButton, amllOriginalSourceThemeButton])
         themeList.orientation = .horizontal
@@ -73,13 +73,13 @@ class PreferenceLyricsWindowThemeViewController: PreferenceViewController, FontS
         button.target = self
         button.action = #selector(themeChanged(_:))
         button.wantsLayer = true
-        button.layer?.cornerRadius = 8
+        button.layer?.cornerRadius = 10
         button.layer?.borderWidth = 1
         button.translatesAutoresizingMaskIntoConstraints = false
 
         NSLayoutConstraint.activate([
-            button.widthAnchor.constraint(equalToConstant: 190),
-            button.heightAnchor.constraint(equalToConstant: 112),
+            button.widthAnchor.constraint(equalToConstant: 200),
+            button.heightAnchor.constraint(equalToConstant: 120),
         ])
     }
 
@@ -149,15 +149,15 @@ class PreferenceLyricsWindowThemeViewController: PreferenceViewController, FontS
         configurePanel(classicPanel)
 
         classicFontField.fontChangeDelegate = self
-        classicPanel.addArrangedSubview(row(label: "Font:", control: classicFontField))
+        classicPanel.addArrangedSubview(row(label: preferenceLocalized("Font:"), control: classicFontField))
 
         classicTextWell.target = self
         classicTextWell.action = #selector(classicColorChanged(_:))
         classicHighlightWell.target = self
         classicHighlightWell.action = #selector(classicColorChanged(_:))
         classicPanel.addArrangedSubview(colorGrid([
-            ("Lyrics", classicTextWell),
-            ("Highlight", classicHighlightWell),
+            (preferenceLocalized("Lyrics"), classicTextWell),
+            (preferenceLocalized("Highlight"), classicHighlightWell),
         ]))
     }
 
@@ -165,34 +165,41 @@ class PreferenceLyricsWindowThemeViewController: PreferenceViewController, FontS
         configurePanel(webViewPanel)
 
         webViewFontField.fontChangeDelegate = self
-        webViewPanel.addArrangedSubview(row(label: "Font:", control: webViewFontField))
+        webViewPanel.addArrangedSubview(row(label: preferenceLocalized("Font:"), control: webViewFontField))
 
         webViewAlignmentControl.segmentCount = 2
-        webViewAlignmentControl.setLabel("Left", forSegment: 0)
-        webViewAlignmentControl.setLabel("Center", forSegment: 1)
+        webViewAlignmentControl.setLabel(preferenceLocalized("Left"), forSegment: 0)
+        webViewAlignmentControl.setLabel(preferenceLocalized("Center"), forSegment: 1)
         webViewAlignmentControl.trackingMode = .selectOne
         webViewAlignmentControl.target = self
         webViewAlignmentControl.action = #selector(webViewAlignmentChanged(_:))
         webViewAlignmentControl.widthAnchor.constraint(equalToConstant: 220).isActive = true
-        webViewPanel.addArrangedSubview(row(label: "Alignment:", control: webViewAlignmentControl))
+        webViewPanel.addArrangedSubview(row(label: preferenceLocalized("Alignment:"), control: webViewAlignmentControl))
 
         webViewLineSpacingSlider.target = self
         webViewLineSpacingSlider.action = #selector(webViewLineSpacingChanged(_:))
-        webViewPanel.addArrangedSubview(row(label: "Line Gap:", control: sliderRow(webViewLineSpacingSlider, webViewLineSpacingLabel)))
+        webViewPanel.addArrangedSubview(row(label: preferenceLocalized("Line Gap:"), control: sliderRow(webViewLineSpacingSlider, webViewLineSpacingLabel)))
 
         webViewMotionSlider.target = self
         webViewMotionSlider.action = #selector(webViewMotionChanged(_:))
-        webViewPanel.addArrangedSubview(row(label: "Motion:", control: sliderRow(webViewMotionSlider, webViewMotionLabel)))
+        webViewPanel.addArrangedSubview(row(label: preferenceLocalized("Motion:"), control: sliderRow(webViewMotionSlider, webViewMotionLabel)))
 
-        let resetButton = NSButton(title: "Reset WebView", target: self, action: #selector(resetWebView(_:)))
+        let resetButton = NSButton(title: preferenceLocalized("Reset Theme"), target: self, action: #selector(resetWebView(_:)))
         webViewPanel.addArrangedSubview(resetButton)
     }
 
     private func configurePanel(_ panel: NSStackView) {
         panel.orientation = .vertical
         panel.alignment = .centerX
-        panel.spacing = 12
+        panel.spacing = 14
+        panel.edgeInsets = NSEdgeInsets(top: 18, left: 24, bottom: 18, right: 24)
+        panel.wantsLayer = true
+        panel.layer?.cornerRadius = 12
+        panel.layer?.borderWidth = 1
+        panel.layer?.borderColor = NSColor.separatorColor.cgColor
+        panel.layer?.backgroundColor = NSColor.controlBackgroundColor.withAlphaComponent(0.32).cgColor
         panel.translatesAutoresizingMaskIntoConstraints = false
+        panel.widthAnchor.constraint(equalToConstant: 520).isActive = true
     }
 
     private func row(label: String, control: NSView) -> NSStackView {
@@ -268,7 +275,7 @@ class PreferenceLyricsWindowThemeViewController: PreferenceViewController, FontS
             let isSelected = button.tag == theme.rawValue
             button.layer?.borderColor = (isSelected ? NSColor.controlAccentColor : NSColor.separatorColor).cgColor
             button.layer?.borderWidth = isSelected ? 2 : 1
-            button.layer?.backgroundColor = (isSelected ? NSColor.controlAccentColor.withAlphaComponent(0.12) : NSColor.clear).cgColor
+            button.layer?.backgroundColor = (isSelected ? NSColor.controlAccentColor.withAlphaComponent(0.14) : NSColor.controlBackgroundColor.withAlphaComponent(0.24)).cgColor
         }
     }
 

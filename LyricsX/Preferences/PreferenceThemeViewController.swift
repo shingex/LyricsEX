@@ -27,7 +27,7 @@ class PreferenceThemeViewController: PreferenceViewController, FontSelectTextFie
     private let modernBackgroundWell = NSColorWell(frame: .zero)
     private let modernOpacitySlider = NSSlider(value: 50, minValue: 0, maxValue: 100, target: nil, action: nil)
     private let modernOpacityLabel = NSTextField(labelWithString: "")
-    private let modernBlurButton = NSButton(checkboxWithTitle: "Use blur material", target: nil, action: nil)
+    private let modernBlurButton = NSButton(checkboxWithTitle: preferenceLocalized("Use blur material"), target: nil, action: nil)
     private let modernCornerRadiusSlider = NSSlider(value: 16, minValue: 0, maxValue: 32, target: nil, action: nil)
     private let modernCornerRadiusLabel = NSTextField(labelWithString: "")
     private let modernInactiveBlurSlider = NSSlider(value: 2, minValue: 0, maxValue: 2, target: nil, action: nil)
@@ -46,7 +46,7 @@ class PreferenceThemeViewController: PreferenceViewController, FontSelectTextFie
     private let albumBlurBlurLabel = NSTextField(labelWithString: "")
     private let albumBlurCornerRadiusSlider = NSSlider(value: 16, minValue: 0, maxValue: 32, target: nil, action: nil)
     private let albumBlurCornerRadiusLabel = NSTextField(labelWithString: "")
-    private let albumBlurReverseGradientButton = NSButton(checkboxWithTitle: "Reverse gradient", target: nil, action: nil)
+    private let albumBlurReverseGradientButton = NSButton(checkboxWithTitle: preferenceLocalized("Reverse gradient"), target: nil, action: nil)
     private let albumBlurInactiveBlurSlider = NSSlider(value: 2, minValue: 0, maxValue: 2, target: nil, action: nil)
     private let albumBlurInactiveBlurLabel = NSTextField(labelWithString: "")
 
@@ -65,17 +65,17 @@ class PreferenceThemeViewController: PreferenceViewController, FontSelectTextFie
     private let amllDynamicIntensityLabel = NSTextField(labelWithString: "")
     private let amllDynamicCornerRadiusSlider = NSSlider(value: 18, minValue: 0, maxValue: 36, target: nil, action: nil)
     private let amllDynamicCornerRadiusLabel = NSTextField(labelWithString: "")
-    private let amllDynamicReverseGradientButton = NSButton(checkboxWithTitle: "Reverse gradient", target: nil, action: nil)
+    private let amllDynamicReverseGradientButton = NSButton(checkboxWithTitle: preferenceLocalized("Reverse gradient"), target: nil, action: nil)
     private let amllDynamicInactiveBlurSlider = NSSlider(value: 2, minValue: 0, maxValue: 2, target: nil, action: nil)
     private let amllDynamicInactiveBlurLabel = NSTextField(labelWithString: "")
 
     override func loadView() {
-        view = NSView(frame: NSRect(x: 0, y: 0, width: 760, height: 560))
+        view = NSView(frame: NSRect(x: 0, y: 0, width: 760, height: 680))
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "Desktop Lyrics Theme"
+        title = preferenceLocalized("Desktop Lyrics")
         setupViews()
         reloadControls()
     }
@@ -84,25 +84,25 @@ class PreferenceThemeViewController: PreferenceViewController, FontSelectTextFie
         let root = NSStackView()
         root.orientation = .vertical
         root.alignment = .centerX
-        root.spacing = 18
+        root.spacing = 24
         root.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(root)
 
         NSLayoutConstraint.activate([
-            root.topAnchor.constraint(equalTo: view.topAnchor, constant: 24),
+            root.topAnchor.constraint(equalTo: view.topAnchor, constant: 28),
             root.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 32),
             root.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -32),
         ])
 
-        configureThemeButton(classicThemeButton, title: "Classic", theme: .classic, image: themePreviewImage(theme: .classic))
-        configureThemeButton(modernThemeButton, title: "Modern", theme: .modern, image: themePreviewImage(theme: .modern))
-        configureThemeButton(albumBlurThemeButton, title: "Album Blur", theme: .albumBlur, image: themePreviewImage(theme: .albumBlur))
-        configureThemeButton(amllDynamicThemeButton, title: "AMLL Dynamic / Apple Music", theme: .amllDynamic, image: themePreviewImage(theme: .amllDynamic))
+        configureThemeButton(classicThemeButton, title: preferenceLocalized("Classic"), theme: .classic, image: themePreviewImage(theme: .classic))
+        configureThemeButton(modernThemeButton, title: preferenceLocalized("Modern"), theme: .modern, image: themePreviewImage(theme: .modern))
+        configureThemeButton(albumBlurThemeButton, title: preferenceLocalized("Album Blur"), theme: .albumBlur, image: themePreviewImage(theme: .albumBlur))
+        configureThemeButton(amllDynamicThemeButton, title: preferenceLocalized("AMLL Dynamic"), theme: .amllDynamic, image: themePreviewImage(theme: .amllDynamic))
 
         let themeList = NSStackView(views: [classicThemeButton, modernThemeButton, albumBlurThemeButton, amllDynamicThemeButton])
         themeList.orientation = .horizontal
         themeList.alignment = .top
-        themeList.spacing = 14
+        themeList.spacing = 12
         root.addArrangedSubview(themeList)
 
         setupClassicPanel()
@@ -122,7 +122,7 @@ class PreferenceThemeViewController: PreferenceViewController, FontSelectTextFie
         button.imagePosition = .imageAbove
         button.imageScaling = .scaleProportionallyUpOrDown
         button.alignment = .center
-        button.font = .systemFont(ofSize: 13, weight: .medium)
+        button.font = .systemFont(ofSize: 12, weight: .medium)
         button.bezelStyle = .regularSquare
         button.isBordered = false
         button.setButtonType(.momentaryChange)
@@ -130,20 +130,20 @@ class PreferenceThemeViewController: PreferenceViewController, FontSelectTextFie
         button.target = self
         button.action = #selector(themeChanged(_:))
         button.wantsLayer = true
-        button.layer?.cornerRadius = 8
+        button.layer?.cornerRadius = 10
         button.layer?.borderWidth = 1
         button.translatesAutoresizingMaskIntoConstraints = false
 
         NSLayoutConstraint.activate([
-            button.widthAnchor.constraint(equalToConstant: 160),
-            button.heightAnchor.constraint(equalToConstant: 112),
+            button.widthAnchor.constraint(equalToConstant: 134),
+            button.heightAnchor.constraint(equalToConstant: 104),
         ])
     }
 
     private func themePreviewImage(theme: DesktopLyricsTheme) -> NSImage {
-        let size = NSSize(width: 150, height: 68)
+        let size = NSSize(width: 120, height: 56)
         return NSImage(size: size, flipped: false) { _ in
-            let backgroundRect = NSRect(x: 10, y: 16, width: 130, height: 38)
+            let backgroundRect = NSRect(x: 8, y: 12, width: 104, height: 32)
             let background = NSBezierPath(roundedRect: backgroundRect, xRadius: theme == .classic ? 14 : 18, yRadius: theme == .classic ? 14 : 18)
             background.addClip()
 
@@ -173,10 +173,10 @@ class PreferenceThemeViewController: PreferenceViewController, FontSelectTextFie
             }
 
             let attributes: [NSAttributedString.Key: Any] = [
-                .font: NSFont.systemFont(ofSize: 23, weight: .bold),
+                .font: NSFont.systemFont(ofSize: 19, weight: .bold),
                 .foregroundColor: NSColor.white,
             ]
-            "LyricsX".draw(at: NSPoint(x: 31, y: 25), withAttributes: attributes)
+            "LyricsX".draw(at: NSPoint(x: 24, y: 18), withAttributes: attributes)
             return true
         }
     }
@@ -184,126 +184,133 @@ class PreferenceThemeViewController: PreferenceViewController, FontSelectTextFie
     private func setupClassicPanel() {
         configurePanel(classicPanel)
         classicFontField.fontChangeDelegate = self
-        classicPanel.addArrangedSubview(row(label: "Font:", control: classicFontField))
+        classicPanel.addArrangedSubview(row(label: preferenceLocalized("Font:"), control: classicFontField))
         [classicBackgroundWell, classicTextWell, classicProgressWell, classicShadowWell].forEach {
             $0.target = self
             $0.action = #selector(classicColorChanged(_:))
         }
         classicBackgroundOpacitySlider.target = self
         classicBackgroundOpacitySlider.action = #selector(classicBackgroundOpacityChanged(_:))
-        classicPanel.addArrangedSubview(row(label: "Background:", control: colorOpacityRow(classicBackgroundWell, classicBackgroundOpacitySlider, classicBackgroundOpacityLabel)))
+        classicPanel.addArrangedSubview(row(label: preferenceLocalized("Background:"), control: colorOpacityRow(classicBackgroundWell, classicBackgroundOpacitySlider, classicBackgroundOpacityLabel)))
         classicPanel.addArrangedSubview(colorGrid([
-            ("Lyrics", classicTextWell),
-            ("Progress", classicProgressWell),
-            ("Shadow", classicShadowWell),
+            (preferenceLocalized("Lyrics"), classicTextWell),
+            (preferenceLocalized("Progress"), classicProgressWell),
+            (preferenceLocalized("Shadow"), classicShadowWell),
         ]))
         classicInactiveBlurSlider.target = self
         classicInactiveBlurSlider.action = #selector(classicInactiveBlurChanged(_:))
         classicInactiveBlurSlider.isContinuous = false
-        classicPanel.addArrangedSubview(row(label: "Inactive blur:", control: sliderRow(classicInactiveBlurSlider, classicInactiveBlurLabel)))
+        classicPanel.addArrangedSubview(row(label: preferenceLocalized("Inactive blur:"), control: sliderRow(classicInactiveBlurSlider, classicInactiveBlurLabel)))
     }
 
     private func setupModernPanel() {
         configurePanel(modernPanel)
         modernFontField.fontChangeDelegate = self
-        modernPanel.addArrangedSubview(row(label: "Font:", control: modernFontField))
+        modernPanel.addArrangedSubview(row(label: preferenceLocalized("Font:"), control: modernFontField))
         [modernTextWell, modernProgressWell, modernBackgroundWell].forEach {
             $0.target = self
             $0.action = #selector(modernColorChanged(_:))
         }
         modernPanel.addArrangedSubview(colorGrid([
-            ("Lyrics", modernTextWell),
-            ("Progress", modernProgressWell),
+            (preferenceLocalized("Lyrics"), modernTextWell),
+            (preferenceLocalized("Progress"), modernProgressWell),
         ]))
         modernOpacitySlider.target = self
         modernOpacitySlider.action = #selector(modernOpacityChanged(_:))
-        modernPanel.addArrangedSubview(row(label: "Background:", control: colorOpacityRow(modernBackgroundWell, modernOpacitySlider, modernOpacityLabel)))
+        modernPanel.addArrangedSubview(row(label: preferenceLocalized("Background:"), control: colorOpacityRow(modernBackgroundWell, modernOpacitySlider, modernOpacityLabel)))
         modernBlurButton.target = self
         modernBlurButton.action = #selector(modernBlurChanged(_:))
-        modernPanel.addArrangedSubview(row(label: "Material:", control: modernBlurButton))
+        modernPanel.addArrangedSubview(row(label: preferenceLocalized("Material:"), control: modernBlurButton))
         modernCornerRadiusSlider.target = self
         modernCornerRadiusSlider.action = #selector(modernCornerRadiusChanged(_:))
-        modernPanel.addArrangedSubview(row(label: "Corner:", control: sliderRow(modernCornerRadiusSlider, modernCornerRadiusLabel)))
+        modernPanel.addArrangedSubview(row(label: preferenceLocalized("Corner:"), control: sliderRow(modernCornerRadiusSlider, modernCornerRadiusLabel)))
         modernInactiveBlurSlider.target = self
         modernInactiveBlurSlider.action = #selector(modernInactiveBlurChanged(_:))
         modernInactiveBlurSlider.isContinuous = false
-        modernPanel.addArrangedSubview(row(label: "Inactive blur:", control: sliderRow(modernInactiveBlurSlider, modernInactiveBlurLabel)))
+        modernPanel.addArrangedSubview(row(label: preferenceLocalized("Inactive blur:"), control: sliderRow(modernInactiveBlurSlider, modernInactiveBlurLabel)))
     }
 
     private func setupAlbumBlurPanel() {
         configurePanel(albumBlurPanel)
         albumBlurFontField.fontChangeDelegate = self
-        albumBlurPanel.addArrangedSubview(row(label: "Font:", control: albumBlurFontField))
+        albumBlurPanel.addArrangedSubview(row(label: preferenceLocalized("Font:"), control: albumBlurFontField))
         [albumBlurTextWell, albumBlurProgressWell, albumBlurTintWell, albumBlurFallbackWell].forEach {
             $0.target = self
             $0.action = #selector(albumBlurColorChanged(_:))
         }
         albumBlurPanel.addArrangedSubview(colorGrid([
-            ("Lyrics", albumBlurTextWell),
-            ("Progress", albumBlurProgressWell),
+            (preferenceLocalized("Lyrics"), albumBlurTextWell),
+            (preferenceLocalized("Progress"), albumBlurProgressWell),
         ]))
         albumBlurReverseGradientButton.target = self
         albumBlurReverseGradientButton.action = #selector(albumBlurReverseGradientChanged(_:))
-        albumBlurPanel.addArrangedSubview(row(label: "Gradient:", control: albumBlurReverseGradientButton))
+        albumBlurPanel.addArrangedSubview(row(label: preferenceLocalized("Gradient:"), control: albumBlurReverseGradientButton))
         albumBlurBackgroundOpacitySlider.target = self
         albumBlurBackgroundOpacitySlider.action = #selector(albumBlurBackgroundOpacityChanged(_:))
-        albumBlurPanel.addArrangedSubview(row(label: "Background:", control: colorOpacityRow(albumBlurFallbackWell, albumBlurBackgroundOpacitySlider, albumBlurBackgroundOpacityLabel)))
+        albumBlurPanel.addArrangedSubview(row(label: preferenceLocalized("Background:"), control: colorOpacityRow(albumBlurFallbackWell, albumBlurBackgroundOpacitySlider, albumBlurBackgroundOpacityLabel)))
         albumBlurDimSlider.target = self
         albumBlurDimSlider.action = #selector(albumBlurDimChanged(_:))
-        albumBlurPanel.addArrangedSubview(row(label: "Dim:", control: colorOpacityRow(albumBlurTintWell, albumBlurDimSlider, albumBlurDimLabel)))
+        albumBlurPanel.addArrangedSubview(row(label: preferenceLocalized("Dim:"), control: colorOpacityRow(albumBlurTintWell, albumBlurDimSlider, albumBlurDimLabel)))
         albumBlurBlurSlider.target = self
         albumBlurBlurSlider.action = #selector(albumBlurBlurChanged(_:))
-        albumBlurPanel.addArrangedSubview(row(label: "Blur:", control: sliderRow(albumBlurBlurSlider, albumBlurBlurLabel)))
+        albumBlurPanel.addArrangedSubview(row(label: preferenceLocalized("Blur:"), control: sliderRow(albumBlurBlurSlider, albumBlurBlurLabel)))
         albumBlurCornerRadiusSlider.target = self
         albumBlurCornerRadiusSlider.action = #selector(albumBlurCornerRadiusChanged(_:))
-        albumBlurPanel.addArrangedSubview(row(label: "Corner:", control: sliderRow(albumBlurCornerRadiusSlider, albumBlurCornerRadiusLabel)))
+        albumBlurPanel.addArrangedSubview(row(label: preferenceLocalized("Corner:"), control: sliderRow(albumBlurCornerRadiusSlider, albumBlurCornerRadiusLabel)))
         albumBlurInactiveBlurSlider.target = self
         albumBlurInactiveBlurSlider.action = #selector(albumBlurInactiveBlurChanged(_:))
         albumBlurInactiveBlurSlider.isContinuous = false
-        albumBlurPanel.addArrangedSubview(row(label: "Inactive blur:", control: sliderRow(albumBlurInactiveBlurSlider, albumBlurInactiveBlurLabel)))
+        albumBlurPanel.addArrangedSubview(row(label: preferenceLocalized("Inactive blur:"), control: sliderRow(albumBlurInactiveBlurSlider, albumBlurInactiveBlurLabel)))
     }
 
     private func setupAMLLDynamicPanel() {
         configurePanel(amllDynamicPanel)
         amllDynamicFontField.fontChangeDelegate = self
-        amllDynamicPanel.addArrangedSubview(row(label: "Font:", control: amllDynamicFontField))
+        amllDynamicPanel.addArrangedSubview(row(label: preferenceLocalized("Font:"), control: amllDynamicFontField))
         [amllDynamicTextWell, amllDynamicProgressWell, amllDynamicTintWell, amllDynamicFallbackWell].forEach {
             $0.target = self
             $0.action = #selector(amllDynamicColorChanged(_:))
         }
         amllDynamicPanel.addArrangedSubview(colorGrid([
-            ("Lyrics", amllDynamicTextWell),
-            ("Progress", amllDynamicProgressWell),
+            (preferenceLocalized("Lyrics"), amllDynamicTextWell),
+            (preferenceLocalized("Progress"), amllDynamicProgressWell),
         ]))
         amllDynamicReverseGradientButton.target = self
         amllDynamicReverseGradientButton.action = #selector(amllDynamicReverseGradientChanged(_:))
-        amllDynamicPanel.addArrangedSubview(row(label: "Gradient:", control: amllDynamicReverseGradientButton))
+        amllDynamicPanel.addArrangedSubview(row(label: preferenceLocalized("Gradient:"), control: amllDynamicReverseGradientButton))
         amllDynamicBackgroundOpacitySlider.target = self
         amllDynamicBackgroundOpacitySlider.action = #selector(amllDynamicBackgroundOpacityChanged(_:))
-        amllDynamicPanel.addArrangedSubview(row(label: "Background:", control: colorOpacityRow(amllDynamicFallbackWell, amllDynamicBackgroundOpacitySlider, amllDynamicBackgroundOpacityLabel)))
+        amllDynamicPanel.addArrangedSubview(row(label: preferenceLocalized("Background:"), control: colorOpacityRow(amllDynamicFallbackWell, amllDynamicBackgroundOpacitySlider, amllDynamicBackgroundOpacityLabel)))
         amllDynamicDimSlider.target = self
         amllDynamicDimSlider.action = #selector(amllDynamicDimChanged(_:))
-        amllDynamicPanel.addArrangedSubview(row(label: "Tint:", control: colorOpacityRow(amllDynamicTintWell, amllDynamicDimSlider, amllDynamicDimLabel)))
+        amllDynamicPanel.addArrangedSubview(row(label: preferenceLocalized("Tint:"), control: colorOpacityRow(amllDynamicTintWell, amllDynamicDimSlider, amllDynamicDimLabel)))
         amllDynamicFlowSlider.target = self
         amllDynamicFlowSlider.action = #selector(amllDynamicFlowChanged(_:))
-        amllDynamicPanel.addArrangedSubview(row(label: "Flow:", control: sliderRow(amllDynamicFlowSlider, amllDynamicFlowLabel)))
+        amllDynamicPanel.addArrangedSubview(row(label: preferenceLocalized("Flow:"), control: sliderRow(amllDynamicFlowSlider, amllDynamicFlowLabel)))
         amllDynamicIntensitySlider.target = self
         amllDynamicIntensitySlider.action = #selector(amllDynamicIntensityChanged(_:))
-        amllDynamicPanel.addArrangedSubview(row(label: "Intensity:", control: sliderRow(amllDynamicIntensitySlider, amllDynamicIntensityLabel)))
+        amllDynamicPanel.addArrangedSubview(row(label: preferenceLocalized("Intensity:"), control: sliderRow(amllDynamicIntensitySlider, amllDynamicIntensityLabel)))
         amllDynamicCornerRadiusSlider.target = self
         amllDynamicCornerRadiusSlider.action = #selector(amllDynamicCornerRadiusChanged(_:))
-        amllDynamicPanel.addArrangedSubview(row(label: "Corner:", control: sliderRow(amllDynamicCornerRadiusSlider, amllDynamicCornerRadiusLabel)))
+        amllDynamicPanel.addArrangedSubview(row(label: preferenceLocalized("Corner:"), control: sliderRow(amllDynamicCornerRadiusSlider, amllDynamicCornerRadiusLabel)))
         amllDynamicInactiveBlurSlider.target = self
         amllDynamicInactiveBlurSlider.action = #selector(amllDynamicInactiveBlurChanged(_:))
         amllDynamicInactiveBlurSlider.isContinuous = false
-        amllDynamicPanel.addArrangedSubview(row(label: "Inactive blur:", control: sliderRow(amllDynamicInactiveBlurSlider, amllDynamicInactiveBlurLabel)))
+        amllDynamicPanel.addArrangedSubview(row(label: preferenceLocalized("Inactive blur:"), control: sliderRow(amllDynamicInactiveBlurSlider, amllDynamicInactiveBlurLabel)))
     }
 
     private func configurePanel(_ panel: NSStackView) {
         panel.orientation = .vertical
         panel.alignment = .centerX
-        panel.spacing = 12
+        panel.spacing = 14
+        panel.edgeInsets = NSEdgeInsets(top: 18, left: 24, bottom: 18, right: 24)
+        panel.wantsLayer = true
+        panel.layer?.cornerRadius = 12
+        panel.layer?.borderWidth = 1
+        panel.layer?.borderColor = NSColor.separatorColor.cgColor
+        panel.layer?.backgroundColor = NSColor.controlBackgroundColor.withAlphaComponent(0.32).cgColor
         panel.translatesAutoresizingMaskIntoConstraints = false
+        panel.widthAnchor.constraint(equalToConstant: 520).isActive = true
     }
 
     private func row(label: String, control: NSView) -> NSStackView {
@@ -348,7 +355,7 @@ class PreferenceThemeViewController: PreferenceViewController, FontSelectTextFie
     private func colorOpacityRow(_ colorWell: NSColorWell, _ slider: NSSlider, _ valueLabel: NSTextField) -> NSStackView {
         colorWell.widthAnchor.constraint(equalToConstant: 44).isActive = true
         colorWell.heightAnchor.constraint(equalToConstant: 23).isActive = true
-        let opacityLabel = NSTextField(labelWithString: "Opacity")
+        let opacityLabel = NSTextField(labelWithString: preferenceLocalized("Opacity"))
         opacityLabel.textColor = .secondaryLabelColor
         opacityLabel.alignment = .right
         opacityLabel.widthAnchor.constraint(equalToConstant: 54).isActive = true
@@ -419,7 +426,7 @@ class PreferenceThemeViewController: PreferenceViewController, FontSelectTextFie
             let isSelected = button.tag == theme.rawValue
             button.layer?.borderColor = (isSelected ? NSColor.controlAccentColor : NSColor.separatorColor).cgColor
             button.layer?.borderWidth = isSelected ? 2 : 1
-            button.layer?.backgroundColor = (isSelected ? NSColor.controlAccentColor.withAlphaComponent(0.12) : NSColor.clear).cgColor
+            button.layer?.backgroundColor = (isSelected ? NSColor.controlAccentColor.withAlphaComponent(0.14) : NSColor.controlBackgroundColor.withAlphaComponent(0.24)).cgColor
         }
     }
 

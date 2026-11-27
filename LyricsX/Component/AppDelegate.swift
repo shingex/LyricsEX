@@ -16,7 +16,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValidation, NSMenu
     @IBOutlet var statusBarMenu: NSMenu!
 
     private lazy var updateController = SPUStandardUpdaterController(updaterDelegate: nil, userDriverDelegate: self)
-
     var karaokeLyricsWC: KaraokeLyricsWindowController?
 
     lazy var searchLyricsWC: SearchLyricsWindowController = .init()
@@ -34,7 +33,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValidation, NSMenu
         karaokeLyricsWC = KaraokeLyricsWindowController()
         karaokeLyricsWC?.showWindow(nil)
 
-        MenuBarLyricsController.shared.statusBarMenu = statusBarMenu
         statusBarMenu.delegate = self
         updateAboutMenuTitle()
 
@@ -82,10 +80,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValidation, NSMenu
         if defaults[.isShowLyricsHUD] {
             lyricsHUD.showWindow(nil)
         }
+
+        let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
+        MenuBarLyricsController.shared.install(statusItem: statusItem, menu: statusBarMenu)
     }
 
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows: Bool) -> Bool {
-        return hasVisibleWindows
+        preferencesWindowController.showWindow(nil)
+        return true
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {

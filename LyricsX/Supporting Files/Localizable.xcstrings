@@ -1,6 +1,264 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Advanced" : {
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "高级" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "進階" } }
+      }
+    },
+    "Alignment:" : {
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "对齐：" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "對齊：" } }
+      }
+    },
+    "Album Blur" : {
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "专辑模糊" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "專輯模糊" } }
+      }
+    },
+    "AMLL Dynamic" : {
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "AMLL 动态" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "AMLL 動態" } }
+      }
+    },
+    "AMLL Original Source" : {
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "AMLL 原版" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "AMLL 原版" } }
+      }
+    },
+    "Background:" : {
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "背景：" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "背景：" } }
+      }
+    },
+    "Basics" : {
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "基础" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "基礎" } }
+      }
+    },
+    "Blur:" : {
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "模糊：" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "模糊：" } }
+      }
+    },
+    "Center" : {
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "居中" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "置中" } }
+      }
+    },
+    "Choose a line lyrics theme and refine its visual details." : {
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "选择逐行歌词主题并调整字体、色彩与背景效果。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "選擇逐行歌詞主題並調整字體、色彩與背景效果。" } }
+      }
+    },
+    "Choose the player, file location, language, and app behavior." : {
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "选择播放器、文件位置、语言与应用行为。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "選擇播放器、檔案位置、語言與應用行為。" } }
+      }
+    },
+    "Classic" : {
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "经典" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "經典" } }
+      }
+    },
+    "Corner:" : {
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "圆角：" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "圓角：" } }
+      }
+    },
+    "Configure how line lyrics and the lyrics window behave." : {
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "配置逐行歌词与歌词窗口的显示行为。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "設定逐行歌詞與歌詞視窗的顯示行為。" } }
+      }
+    },
+    "Customize keyboard shortcuts for frequent actions." : {
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "为常用操作自定义键盘快捷键。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "為常用操作自訂鍵盤快捷鍵。" } }
+      }
+    },
+    "Desktop Lyrics" : {
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "逐行歌词" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "逐行歌詞" } }
+      }
+    },
+    "Dim:" : {
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "压暗：" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "壓暗：" } }
+      }
+    },
+    "Flow:" : {
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "流动：" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "流動：" } }
+      }
+    },
+    "Font:" : {
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "字体：" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "字體：" } }
+      }
+    },
+    "Gradient:" : {
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "渐变：" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "漸變：" } }
+      }
+    },
+    "Highlight" : {
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "高亮" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "醒目" } }
+      }
+    },
+    "Inactive blur:" : {
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "非当前行模糊：" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "非目前行模糊：" } }
+      }
+    },
+    "Intensity:" : {
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "强度：" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "強度：" } }
+      }
+    },
+    "Left" : {
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "左对齐" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "靠左" } }
+      }
+    },
+    "Line Gap:" : {
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "行间距：" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "行間距：" } }
+      }
+    },
+    "Lyrics" : {
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "歌词" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "歌詞" } }
+      }
+    },
+    "Lyrics & Appearance" : {
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "歌词与外观" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "歌詞與外觀" } }
+      }
+    },
+    "Lyrics Window" : {
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "歌词窗口" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "歌詞視窗" } }
+      }
+    },
+    "Material:" : {
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "材质：" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "材質：" } }
+      }
+    },
+    "Manage lyrics content that should be ignored." : {
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "管理搜索与显示时需要忽略的歌词内容。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "管理搜尋與顯示時需要忽略的歌詞內容。" } }
+      }
+    },
+    "Modern" : {
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "现代" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "現代" } }
+      }
+    },
+    "Motion:" : {
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "动效：" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "動效：" } }
+      }
+    },
+    "Opacity" : {
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "不透明度" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "不透明度" } }
+      }
+    },
+    "Progress" : {
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "进度" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "進度" } }
+      }
+    },
+    "Reset Theme" : {
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "重置主题" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "重置主題" } }
+      }
+    },
+    "Set the lyrics window theme, typography, and motion." : {
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "设置歌词窗口的主题、字体与动效。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "設定歌詞視窗的主題、字體與動效。" } }
+      }
+    },
+    "Settings" : {
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "设置" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "設定" } }
+      }
+    },
+    "Reverse gradient" : {
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "反转渐变" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "反轉漸變" } }
+      }
+    },
+    "Shadow" : {
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "阴影" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "陰影" } }
+      }
+    },
+    "Tint:" : {
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "色调：" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "色調：" } }
+      }
+    },
+    "Try experimental features that may change." : {
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "试用仍在迭代、未来可能变化的实验功能。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "試用仍在迭代、未來可能變更的實驗功能。" } }
+      }
+    },
+    "Use blur material" : {
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "使用模糊材质" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "使用模糊材質" } }
+      }
+    },
+    "Adjust lyrics providers and their priority." : {
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "调整歌词来源及其搜索优先级。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "調整歌詞來源及其搜尋優先順序。" } }
+      }
+    },
     "OK" : {
       "extractionState" : "manual",
       "localizations" : {
